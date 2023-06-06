@@ -8,6 +8,8 @@
     <title>Table of meals</title>
 </head>
 <body>
+<h3><a href="index.html">Home</a></h3>
+<hr>
 <h2 align=center>Моя еда</h2>
 <table border=1 align=center cellpadding=10>
 <tr>
@@ -15,14 +17,12 @@
 <th>Описание</th>
 <th>Калории</th>
 </tr>
-<% List<MealTo> mealsTo = (List<MealTo>) request.getAttribute("mealsTo");
-%>
 <c:forEach items = "${mealsTo}" var="meal">
     <tr style="color:${meal.isExcess() ? 'green' : 'red'}">
         <fmt:parseDate value = "${meal.getDateTime()}" var = "dateTime" pattern = "yyyy-MM-dd'T'HH:mm" type="both" />
         <td><fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${dateTime}" /></td>
-        <td><c:out value = "${meal.getDescription()}"/></td>
-        <td><c:out value = "${meal.getCalories()}"/></td>
+        <td>${meal.description}</td>
+        <td>${meal.calories}</td>
         </font>
     </tr>
 </c:forEach>
