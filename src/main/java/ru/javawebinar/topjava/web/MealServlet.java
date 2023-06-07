@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.util.CRUDCollection;
 
 import static ru.javawebinar.topjava.util.MealsUtil.filteredByStreams;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -21,7 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(UserServlet.class);
 
-    static List<Meal> meals = Arrays.asList(
+    public static List<Meal> meals = Arrays.asList(
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -34,9 +35,40 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<MealTo> mealsTo = filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
-        request.setAttribute("mealsTo", mealsTo);
-        log.debug("redirect to meals");
-        request.getRequestDispatcher("/meals.jsp").forward(request, response);
+        String action = request.getParameter("action");
+        if (action == null) {
+            List<MealTo> mealsTo = filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
+            request.setAttribute("mealsTo", mealsTo);
+            log.debug("redirect to meals");
+            request.getRequestDispatcher("/meals.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if (action == "update") {
+            LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("datetime"));
+            String description = request.getParameter("description");
+            int calories = Integer.parseInt(request.getParameter("calories"));
+
+            CRUDCollection crudCollection = new CRUDCollection();
+            crudCollection.addMeal(dateTime, description, calories);
+
+            log.debug("redirect to update");
+
+            request.getRequestDispatcher("/update_meal.jsp").forward(request, response);
+        } else if (action == "delete") {
+            int id = Integer.parseInt(request.getParameter("id"));
+        } else if (action == "add") {
+            LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("datetime"));
+            String description = request.getParameter("description");
+            int calories = Integer.parseInt(request.getParameter("calories"));
+
+            CRUDCollection crudCollection = new CRUDCollection();
+            crudCollection.addMeal(dateTime, description, calories);
+            log.debug("redirect to add");
+            request.getRequestDispatcher("/add_meal.jsp").forward(request, response);
+        }
     }
 }

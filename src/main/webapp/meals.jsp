@@ -11,11 +11,14 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2 align=center>Моя еда</h2>
+<a href="meals?action=add">Add Meal</a>
 <table border=1 align=center cellpadding=10>
 <tr>
 <th>Дата/Время</th>
 <th>Описание</th>
 <th>Калории</th>
+<th></th>
+<th></th>
 </tr>
 <c:forEach items = "${mealsTo}" var="meal">
     <tr style="color:${meal.isExcess() ? 'green' : 'red'}">
@@ -23,7 +26,8 @@
         <td><fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${dateTime}" /></td>
         <td>${meal.description}</td>
         <td>${meal.calories}</td>
-        </font>
+        <td><a href="meals?action=update&id=${meal.id}">Update</a></td>
+        <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>
     </tr>
 </c:forEach>
 </table>
