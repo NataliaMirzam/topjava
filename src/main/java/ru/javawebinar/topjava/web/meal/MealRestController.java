@@ -8,35 +8,31 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 
-import static ru.javawebinar.topjava.util.MealsUtil.*;
-import static ru.javawebinar.topjava.web.SecurityUtil.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collection;
+import java.util.List;
 
+import static ru.javawebinar.topjava.util.MealsUtil.getTos;
+import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     private MealService service;
 
-    public Collection<MealTo> getAll() {
+    public List<MealTo> getAll() {
         log.info("getAll");
         return getTos(service.getAll(authUserId()), authUserCaloriesPerDay());
     }
 
-    public Collection<MealTo> getAllBetweenTimes(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        log.info("getAllBetweenTimes");
-        return getFilteredTos(service.getAll(authUserId()), authUserCaloriesPerDay(), startDateTime, endDateTime, LocalTime.class);
-    }
-
-    public Collection<MealTo> getAllBetweenDates(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        log.info("getAllBetweenDates");
-        return getFilteredTos(service.getAll(authUserId()), authUserCaloriesPerDay(), startDateTime, endDateTime, LocalDate.class);
+    public List<MealTo> getAllBetweenLocalDateTimes(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        log.info("getAllBetweenLocalDateTimes");
+        return getTos(service.getAllBetweenLocalDateTimes(LocalDateTime.of(startDate, startTime), LocalDateTime.of(endDate, endTime), authUserId()), authUserCaloriesPerDay());
     }
 
     public Meal get(int id) {
@@ -55,8 +51,9 @@ public class MealRestController {
         service.delete(id, authUserId());
     }
 
-    public void update(Meal meal) {
-        log.info("update {} with id={}", meal, meal.getId());
+    public void update(Meal meal, int id) {
+        log.info("update {} with id={}", meal, id);
+        assureIdConsistent(meal, id);
         service.update(meal, authUserId());
     }
 }
