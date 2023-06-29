@@ -26,8 +26,7 @@ public class JpaMealRepository implements MealRepository {
             em.persist(meal);
             return meal;
         } else {
-            Meal mealRef = em.find(Meal.class, meal.getId());
-            return ((mealRef != null) && mealRef.getUser().getId().equals(userId)) ? em.merge(meal) : null;
+            return get(meal.id(), userId) == null ? null : em.merge(meal);
         }
     }
 
@@ -42,10 +41,8 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> meals = em.createNamedQuery(Meal.GET, Meal.class)
-                .setParameter("id", id)
-                .setParameter("userid", userId).getResultList();
-        return DataAccessUtils.singleResult(meals);
+        Meal meal = em.find(Meal.class, id);
+        return meal != null && meal.getUser().getId() == userId ? meal : null;
     }
 
     @Override
