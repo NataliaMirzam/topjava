@@ -63,8 +63,7 @@ public class JspMealController {
     }
 
     @PostMapping()
-    public String save(HttpServletRequest request, Model model) throws IOException {
-        request.setCharacterEncoding("UTF-8");
+    public String save(HttpServletRequest request) throws IOException {
         Meal meal = new Meal(
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
@@ -93,7 +92,7 @@ public class JspMealController {
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable int id, Model model) {
+    public String delete(@PathVariable int id) {
         int userId = SecurityUtil.authUserId();
         log.info("delete meal {} for user {}", id, userId);
         service.delete(id, userId);

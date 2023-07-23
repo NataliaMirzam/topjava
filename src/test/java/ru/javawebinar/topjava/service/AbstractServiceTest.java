@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.service;
 import org.junit.Assume;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 public abstract class AbstractServiceTest {
     @Autowired
-    Environment env;
+    private Environment env;
 
     @ClassRule
     public static ExternalResource summary = TimingRules.SUMMARY;
@@ -39,7 +40,6 @@ public abstract class AbstractServiceTest {
 
     //  Check root cause in JUnit: https://github.com/junit-team/junit4/pull/778
     protected <T extends Throwable> void validateRootCause(Class<T> rootExceptionClass, Runnable runnable) {
-        Assume.assumeFalse(env.acceptsProfiles(org.springframework.core.env.Profiles.of(Profiles.JDBC)));
         assertThrows(rootExceptionClass, () -> {
             try {
                 runnable.run();
@@ -47,5 +47,10 @@ public abstract class AbstractServiceTest {
                 throw getRootCause(e);
             }
         });
+    }
+
+    @Test
+    public void createWithException() throws Exception {
+        Assume.assumeFalse(env.acceptsProfiles(org.springframework.core.env.Profiles.of(Profiles.JDBC)));
     }
 }
